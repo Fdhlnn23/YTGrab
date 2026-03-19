@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YTGrab</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--red:#E53935;--red-dark:#B71C1C;--bg:#0D0D0D;--bg2:#161616;--bg3:#1E1E1E;--border:rgba(255,255,255,0.08);--text:#F5F5F5;--muted:#888;--mono:'DM Mono',monospace;--sans:'Space Grotesk',sans-serif}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;display:flex;flex-direction:column;align-items:center}
+header{width:100%;padding:1.5rem 2rem;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.logo-icon{width:32px;height:32px;background:var(--red);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.logo-icon svg{width:18px;height:18px;fill:white}
+.logo-text{font-size:1.1rem;font-weight:700;letter-spacing:-0.5px}
+.logo-text span{color:var(--red)}
+.wrap{width:100%;max-width:680px;padding:0 1.5rem}
+.hero{padding:4rem 0 2rem;text-align:center}
+.badge{display:inline-block;background:rgba(229,57,53,0.15);color:var(--red);border:1px solid rgba(229,57,53,0.3);font-size:0.7rem;font-family:var(--mono);letter-spacing:2px;text-transform:uppercase;padding:4px 12px;border-radius:100px;margin-bottom:1.2rem}
+h1{font-size:clamp(1.8rem,5vw,3rem);font-weight:700;line-height:1.1;letter-spacing:-1.5px;margin-bottom:0.8rem}
+h1 span{color:var(--red)}
+.subtitle{color:var(--muted);font-size:0.95rem;line-height:1.6;margin-bottom:2rem}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.2rem;margin-bottom:1rem}
+.input-row{display:flex;gap:10px;margin-bottom:0.8rem}
+input[type=text]{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--mono);font-size:0.85rem;padding:0.75rem 1rem;outline:none;transition:border-color 0.2s;min-width:0}
+input[type=text]:focus{border-color:var(--red)}
+input[type=text]::placeholder{color:var(--muted)}
+.btn{background:var(--red);color:white;border:none;border-radius:10px;font-family:var(--sans);font-size:0.9rem;font-weight:600;padding:0 1.2rem;height:44px;cursor:pointer;white-space:nowrap;transition:background 0.2s}
+.btn:hover{background:var(--red-dark)}
+.btn:disabled{background:#333;color:#666;cursor:not-allowed}
+.fmt-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.fmt-label{font-size:0.75rem;color:var(--muted);font-family:var(--mono)}
+.fmt-btn{background:var(--bg3);border:1px solid var(--border);color:var(--muted);border-radius:8px;font-family:var(--mono);font-size:0.75rem;padding:6px 14px;cursor:pointer;transition:all 0.15s}
+.fmt-btn.on{background:rgba(229,57,53,0.15);border-color:var(--red);color:var(--red)}
+#msg{border-radius:12px;padding:1rem 1.2rem;margin-bottom:1rem;font-size:0.88rem;line-height:1.5}
+#msg.load{background:rgba(255,200,0,0.07);border:1px solid rgba(255,200,0,0.25);color:#FFC107;display:block}
+#msg.err{background:rgba(229,57,53,0.07);border:1px solid rgba(229,57,53,0.3);color:#EF9A9A;display:block}
+#msg.hide{display:none}
+#vc{display:none;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.2rem;margin-bottom:1rem}
+#vthumb{width:100%;border-radius:8px;aspect-ratio:16/9;object-fit:cover;display:block;margin-bottom:1rem;background:var(--bg3)}
+.vtitle{font-size:0.95rem;font-weight:600;line-height:1.4;margin-bottom:0.3rem}
+.vch{font-size:0.78rem;color:var(--muted);font-family:var(--mono);margin-bottom:0.6rem}
+.vdur{display:inline-block;background:rgba(229,57,53,0.15);color:var(--red);border-radius:4px;font-family:var(--mono);font-size:0.72rem;padding:2px 8px}
+.dl-title{font-size:0.75rem;color:var(--muted);font-family:var(--mono);margin:1rem 0 0.6rem}
+.dl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.dlb{background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 12px;font-family:var(--sans);font-size:0.82rem;text-align:center;cursor:pointer;width:100%;transition:all 0.15s}
+.dlb:hover{border-color:rgba(229,57,53,0.5);background:rgba(229,57,53,0.08)}
+.dlb:disabled{opacity:0.5;cursor:not-allowed}
+.dlb b{font-weight:600;display:block;font-size:0.9rem}
+.dlb small{font-size:0.68rem;color:var(--muted);font-family:var(--mono);display:block;margin-top:2px}
+.feats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;padding:2rem 0}
+.feat{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem}
+.feat-icon{font-size:1.2rem;margin-bottom:0.6rem}
+.feat-title{font-size:0.85rem;font-weight:600;margin-bottom:0.2rem}
+.feat-desc{font-size:0.75rem;color:var(--muted);line-height:1.5}
+footer{padding:1.5rem;color:var(--muted);font-size:0.78rem;text-align:center;border-top:1px solid var(--border);width:100%}
+footer a{color:var(--red);text-decoration:none}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,200,0,0.3);border-top-color:#FFC107;border-radius:50%;animation:sp 0.7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"/></svg></div>
+  <span class="logo-text">YT<span>Grab</span></span>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="badge">YouTube Downloader</div>
+    <h1>Download <span>Video & Audio</span><br>dari YouTube</h1>
+    <p class="subtitle">Paste link YouTube, pilih format, langsung download.</p>
+  </div>
+
+  <div class="card">
+    <div class="input-row">
+      <input type="text" id="url" placeholder="https://www.youtube.com/watch?v=...">
+      <button type="button" class="btn" id="goBtn">Cek Video</button>
+    </div>
+    <div class="fmt-row" id="fmtRow" style="display:none">
+      <span class="fmt-label">Format:</span>
+      <button type="button" class="fmt-btn on" id="fmtVideo">📹 Video (MP4)</button>
+      <button type="button" class="fmt-btn" id="fmtAudio">🎵 Audio (MP3)</button>
+    </div>
+  </div>
+
+  <div id="msg" class="hide"></div>
+  <div id="vc">
+    <img id="vthumb" src="" alt="">
+    <div class="vtitle" id="vtitle"></div>
+    <div class="vch" id="vch"></div>
+    <div class="vdur" id="vdur"></div>
+    <div class="dl-title" id="dlTitle"></div>
+    <div class="dl-grid" id="dlGrid"></div>
+  </div>
+
+  <div class="feats">
+    <div class="feat"><div class="feat-icon">🎬</div><div class="feat-title">Berbagai Resolusi</div><div class="feat-desc">Hanya resolusi yang tersedia untuk video tersebut.</div></div>
+    <div class="feat"><div class="feat-icon">🎵</div><div class="feat-title">Ekstrak Audio</div><div class="feat-desc">Download MP3 atau M4A.</div></div>
+    <div class="feat"><div class="feat-icon">🔒</div><div class="feat-title">Lokal & Privat</div><div class="feat-desc">Semua proses di komputer kamu sendiri.</div></div>
+  </div>
+</div>
+
+<footer>Dibuat dengan yt-dlp &nbsp;·&nbsp; <a href="https://github.com/yt-dlp/yt-dlp" target="_blank">yt-dlp docs</a></footer>
+
+<script>
+(function() {
+  var API = 'http://localhost:5000';
+  var fmt = 'video';
+  var vdata = null;
+  var busy = false;
+
+  function msg(type, html) {
+    var el = document.getElementById('msg');
+    el.className = type; // 'load', 'err', or 'hide'
+    el.innerHTML = html;
+  }
+
+  function doFetch() {
+    if (busy) return;
+    var url = document.getElementById('url').value.trim();
+    if (!url) { msg('err', '⚠ Masukkan link YouTube.'); return; }
+
+    busy = true;
+    document.getElementById('goBtn').disabled = true;
+    document.getElementById('goBtn').textContent = '...';
+    msg('load', '<span class="spin"></span>Mengambil info...');
+
+    fetch(API + '/info?url=' + encodeURIComponent(url))
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        if (d.error) { msg('err', '✕ ' + d.error); return; }
+        vdata = d;
+        vdata._url = url;
+        msg('hide', '');
+        renderCard();
+        document.getElementById('fmtRow').style.display = 'flex';
+      })
+      .catch(function(e) {
+        msg('err', '✕ Tidak bisa konek ke server. Pastikan server.py jalan.');
+      })
+      .finally(function() {
+        busy = false;
+        document.getElementById('goBtn').disabled = false;
+        document.getElementById('goBtn').textContent = 'Cek Video';
+      });
+  }
+
+  function renderCard() {
+    var thumb = document.getElementById('vthumb');
+    thumb.src = vdata.thumbnail || '';
+    document.getElementById('vtitle').textContent = vdata.title || '-';
+    document.getElementById('vch').textContent = '↗ ' + (vdata.channel || 'Unknown');
+    var dur = vdata.duration || 0;
+    var h = Math.floor(dur/3600), m = Math.floor((dur%3600)/60), s = dur%60;
+    document.getElementById('vdur').textContent = h > 0
+      ? h+':'+pad(m)+':'+pad(s) : m+':'+pad(s);
+    renderDL();
+    document.getElementById('vc').style.display = 'block';
+  }
+
+  function pad(n) { return String(n).padStart(2,'0'); }
+
+  function renderDL() {
+    var grid = document.getElementById('dlGrid');
+    var title = document.getElementById('dlTitle');
+    grid.innerHTML = '';
+    if (fmt === 'video') {
+      title.textContent = '// Pilih kualitas:';
+      var qs = (vdata.available_qualities && vdata.available_qualities.length)
+        ? vdata.available_qualities : [360,480,720,1080];
+      qs.forEach(function(q) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'dlb';
+        b.innerHTML = '<b>'+q+'p</b><small>MP4 Video</small>';
+        b.addEventListener('click', function() {
+          dlFile(API+'/download?url='+encodeURIComponent(vdata._url)+'&format=video&quality='+q, b);
+        });
+        grid.appendChild(b);
+      });
+    } else {
+      title.textContent = '// Pilih format audio:';
+      ['mp3','m4a'].forEach(function(ext) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'dlb';
+        b.innerHTML = '<b>'+ext.toUpperCase()+'</b><small>Audio</small>';
+        b.addEventListener('click', function() {
+          dlFile(API+'/download?url='+encodeURIComponent(vdata._url)+'&format=audio&ext='+ext, b);
+        });
+        grid.appendChild(b);
+      });
+    }
+  }
+
+function dlFile(url, btn) {
+  var orig = btn.innerHTML;
+  btn.innerHTML = '<b>⏳</b><small>Memproses...</small>';
+  btn.disabled = true;
+
+  // 🔥 pakai anchor, bukan window.open
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = '';
+  a.style.display = 'none';
+
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  setTimeout(function() {
+    btn.innerHTML = orig;
+    btn.disabled = false;
+  }, 5000);
+}
+
+  // Pasang event — SATU KALI saja via IIFE
+  document.getElementById('goBtn').addEventListener('click', doFetch);
+  document.getElementById('url').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); doFetch(); }
+  });
+  document.getElementById('fmtVideo').addEventListener('click', function() {
+    fmt = 'video';
+    document.getElementById('fmtVideo').className = 'fmt-btn on';
+    document.getElementById('fmtAudio').className = 'fmt-btn';
+    if (vdata) renderDL();
+  });
+  document.getElementById('fmtAudio').addEventListener('click', function() {
+    fmt = 'audio';
+    document.getElementById('fmtAudio').className = 'fmt-btn on';
+    document.getElementById('fmtVideo').className = 'fmt-btn';
+    if (vdata) renderDL();
+  });
+})();
+</script>
+</body>
+</html>
